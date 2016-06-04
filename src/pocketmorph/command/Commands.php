@@ -4,22 +4,16 @@ namespace pocketmorph\command;
 use pocketmorph\PocketMorph;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\utils\TextFormat;
 
-class Commands {
+class MorphCommand extends Command implements PluginIdentifiableCommand {
 	
-	public $plugin;
+	/** @var PocketMorph $plugin */
+	private $plugin;
 	
-	public function __construct(PocketMorph $plugin) {
-		$this->plugin = $plugin;
-	}
-	
-	public function getPlugin() {
-		return $this->plugin;
-	}
-	
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-		$types = [
+	/** @var String[] $types */
+	private	$types = [
 		 "Chicken",
 		 "Pig",
 		 "Sheep",
@@ -46,7 +40,16 @@ class Commands {
 		 "ZombieVillager",
 		 "Snowman",
 		 ];
-							 
+	
+	public function __construct(PocketMorph $plugin) {
+		$this->plugin = $plugin;
+		
+		parent::__construct("morph", "Transform into a mob", "/morph <remove|help|list|entity>");
+		$this->setPermission("morph.command");
+	}
+	
+	public function execute(CommandSender $sender, $label, array $args) {
+							
 		if(strtolower($cmd->getName()) == "morph") {
 			if($sender->hasPermission("morph.command")) {
 				
@@ -55,13 +58,15 @@ class Commands {
 						$sender->sendMessage(TextFormat::YELLOW . "Type '/morph help' for a list of commands");
 					} else {						
 						if(strtolower($args[0]) == "list") {
-							$sender->sendMessage(TextFormat::YELLOW . "Entities: " . implode(',', $types));
+							$sender->sendMessage(TextFormat::YELLOW . "Entities: " . implode(',', $this->types));
 						}
 						
 						if(strtolower($args[0]) == "remove") {
 							if($this->getPlugin()->getMorphManager()->isMorphed($sender)) {
 								$sender->sendMessage(TextFormat::YELLOW . "Morph removed");
 								$this->getPlugin()->getMorphManager()->removeMorph($sender); 
+							} else {
+								$sender->sendMessage(TextFormat::YELLOW > "You are not disguised");
 							}
 						}
 						
@@ -69,7 +74,7 @@ class Commands {
 							$sender->sendMessage(TextFormat::YELLOW . "PocketMorph help\n- /morph help\n- /morph remove\n- /morph <entity>\n- /morph list");
 						}
 						
-						foreach ($types as $type) {								 
+						foreach ($this->types as $type) {								 
 							if($args[0] == $type) {
 								$typeStr = "Morph" . $args[0];
 								if($this->getPlugin()->getMorphManager()->isMorphed($sender)) {
@@ -84,7 +89,7 @@ class Commands {
 						}
 
 						if(strtolower($args[0]) !== "help" && strtolower($args[0]) !== "remove" && strtolower($args[0]) !== "list") {
-							if(!in_array($args[0], $types)) {
+							if(!in_array($args[0], $this->types)) {
 								$sender->sendMessage(TextFormat::RED . "No such entity, type '/morph list' for a list of all available entities, or '/morph help' for a list of commands");								 
 								
 							}
@@ -93,6 +98,10 @@ class Commands {
 				}
 			}
 		}
+	}
+	
+	public function getPlugin() : PocketMorph {
+		return $this->plugin;
 	}
 }
 	

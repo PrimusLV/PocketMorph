@@ -31,7 +31,7 @@ use pocketmorph\morph\MorphSlime;
 use pocketmorph\morph\MorphChicken;
 use pocketmorph\morph\MorphEnderman;
 use pocketmorph\morph\MorphCaveSpider;
-use pocketmorph\command\Commands;
+use pocketmorph\command\MorphCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 

@@ -39,6 +39,9 @@ class PocketMorph extends PluginBase {
 	
 	public $morphs = [];
 	
+	/** @var MorphManager $morphManager */
+	private $morphManager;
+	
 	public function onEnable() {	
 		     
 		Entity::registerEntity(MorphCreeper::class, true);
@@ -67,19 +70,13 @@ class PocketMorph extends PluginBase {
 	        Entity::registerEntity(MorphEnderman::class, true);
         	Entity::registerEntity(MorphCaveSpider::class, true);
 
+		$this->morphManager = new MorphManager($this);
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-	}
-	
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $args) {
-	        $cmds = new Commands($this);
-		
-		$cmds->onCommand($sender,$cmd, $label,$args);
+		$this->getServer()->getCommandMap()->register("PocketMorph", new MorphCommand($this));
 	}
 	
 	
-	public function getMorphManager() {		
-		return new MorphManager($this);
-	}
+	public function getMorphManager() : MorphManager { return $this->morphManager; }
 	
 	
 }
